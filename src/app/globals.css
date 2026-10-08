@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+/* ---------- Design tokens ---------- */
+@theme {
+  --color-ink: #0a0a0a;
+  --color-coal: #111111;
+  --color-graphite: #181818;
+  --color-gold: #c6a663;
+  --color-gold-bright: #e2c88f;
+  --color-gold-deep: #9c7f45;
+  --color-bone: #f2efe9;
+  --color-mist: #a7a39b;
+  --color-smoke: #6f6c66;
+
+  --font-display: "Cinzel", "Times New Roman", serif;
+  --font-sans: "Sora Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  --line: rgb(255 255 255 / 0.08);
+  --line-gold: rgb(198 166 99 / 0.28);
+  --header-h: 72px;
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--header-h);
+  -webkit-text-size-adjust: 100%;
+  background: var(--color-ink);
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---------- Reusable pieces ---------- */
+@layer components {
+  .container-x {
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 20px;
+  }
+  @media (min-width: 768px) {
+    .container-x {
+      padding-inline: 40px;
+    }
+  }
+
+  .section-y {
+    padding-block: clamp(80px, 12vw, 144px);
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    font-weight: 500;
+  }
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    line-height: 1.08;
+  }
+
+  /* Thin gold rule with diamond — used as section ornament */
+  .rule-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--color-gold);
+  }
+  .rule-gold::before,
+  .rule-gold::after {
+    content: "";
+    height: 1px;
+    width: 36px;
+    background: linear-gradient(90deg, transparent, currentColor);
+  }
+  .rule-gold::after {
+    background: linear-gradient(90deg, currentColor, transparent);
+  }
+
+  /* Gold text with a slow, subtle sheen */
+  .text-gold-sheen {
+    background: linear-gradient(
+      110deg,
+      var(--color-gold-deep) 0%,
+      var(--color-gold) 30%,
+      var(--color-gold-bright) 50%,
+      var(--color-gold) 70%,
+      var(--color-gold-deep) 100%
+    );
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: sheen 9s var(--ease-out-soft) infinite;
+  }
+
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@keyframes sheen {
+  0%, 100% { background-position: 100% 0; }
+  50% { background-position: 0% 0; }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.55; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+
+/* Hero entrance (CSS only — no JS needed for first paint) */
+.hero-in > * {
+  animation: rise 1s var(--ease-out-soft) both;
+}
+.hero-in > *:nth-child(2) { animation-delay: 0.08s; }
+.hero-in > *:nth-child(3) { animation-delay: 0.16s; }
+.hero-in > *:nth-child(4) { animation-delay: 0.24s; }
+.hero-in > *:nth-child(5) { animation-delay: 0.32s; }
+
+/* Scroll reveal — only hides content when JS is available */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.9s var(--ease-out-soft),
+    transform 0.9s var(--ease-out-soft);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+html.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html.js [data-reveal] { opacity: 1; transform: none; }
+}
